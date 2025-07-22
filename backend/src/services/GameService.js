@@ -129,6 +129,11 @@ class GameService {
         throw new Error('Game engine not found');
       }
 
+      const validation = goEngine.validateMove(position.x, position.y, player.color);
+      if (!validation.valid) {
+        throw new Error(validation.errors.join(', '));
+      }
+
       const result = goEngine.placeStone(position.x, position.y, player.color);
       if (!result.success) {
         throw new Error(result.error);
@@ -138,7 +143,12 @@ class GameService {
       game.gameState.board = goEngine.board;
       game.gameState.capturedStones = goEngine.capturedStones;
       game.gameState.koPosition = goEngine.koPosition;
+      game.gameState.gamePhase = goEngine.getGamePhase();
       game.switchPlayer();
+
+      if (goEngine.isGameOver()) {
+        await this.endGameByScore(game);
+      }
 
       await game.save();
       await this.cacheGameState(gameId, game);
@@ -235,21 +245,18 @@ class GameService {
       throw new Error('Game engine not found');
     }
 
-    const score = goEngine.calculateScore();
+    const score = goEngine.calculateScore(6.5);
     
-    let winner;
-    if (score.black > score.white) {
-      winner = 'black';
-    } else if (score.white > score.black) {
-      winner = 'white';
-    } else {
-      winner = 'draw';
-    }
-
     game.result = {
-      winner,
+      winner: score.winner,
       method: 'score',
-      score
+      score: {
+        black: score.black,
+        white: score.white,
+        margin: score.margin
+      },
+      territories: score.territories,
+      deadStones: score.deadStones
     };
 
     game.status = 'finished';

@@ -179,10 +179,10 @@ class GoEngine {
     this.koPosition = null;
   }
 
-  calculateScore() {
+  calculateScore(komi = 6.5) {
     const territories = this.findTerritories();
     let blackScore = this.capturedStones.black;
-    let whiteScore = this.capturedStones.white;
+    let whiteScore = this.capturedStones.white + komi;
 
     for (const territory of territories) {
       if (territory.owner === 'black') {
@@ -192,7 +192,18 @@ class GoEngine {
       }
     }
 
-    return { black: blackScore, white: whiteScore };
+    const deadStones = this.findDeadStones();
+    blackScore += deadStones.white;
+    whiteScore += deadStones.black;
+
+    return { 
+      black: blackScore, 
+      white: whiteScore,
+      winner: blackScore > whiteScore ? 'black' : 'white',
+      margin: Math.abs(blackScore - whiteScore),
+      territories: territories,
+      deadStones: deadStones
+    };
   }
 
   findTerritories() {
@@ -267,6 +278,80 @@ class GoEngine {
     this.capturedStones = { ...state.capturedStones };
     this.koPosition = state.koPosition ? { ...state.koPosition } : null;
     this.moveHistory = [...state.moveHistory];
+  }
+
+  findDeadStones() {
+    const deadStones = { black: 0, white: 0 };
+    const visited = new Set();
+
+    for (let x = 0; x < this.boardSize; x++) {
+      for (let y = 0; y < this.boardSize; y++) {
+        const stone = this.getStone(x, y);
+        const key = `${x},${y}`;
+        
+        if (stone && !visited.has(key)) {
+          const group = this.findGroup(x, y);
+          const liberties = this.countLiberties(group);
+          
+          for (const pos of group) {
+            visited.add(`${pos.x},${pos.y}`);
+          }
+          
+          if (liberties === 0) {
+            deadStones[stone] += group.length;
+          }
+        }
+      }
+    }
+
+    return deadStones;
+  }
+
+  isGameOver() {
+    const recentMoves = this.moveHistory.slice(-2);
+    return recentMoves.length >= 2 && 
+           recentMoves.every(move => move.isPass);
+  }
+
+  getGamePhase() {
+    const totalMoves = this.moveHistory.length;
+    const boardArea = this.boardSize * this.boardSize;
+    
+    if (totalMoves < boardArea * 0.1) return 'opening';
+    if (totalMoves < boardArea * 0.6) return 'middle';
+    return 'endgame';
+  }
+
+  validateMove(x, y, color) {
+    const errors = [];
+    
+    if (!this.isValidPosition(x, y)) {
+      errors.push('Position out of bounds');
+    }
+    
+    if (this.board[x][y] !== null) {
+      errors.push('Position occupied');
+    }
+    
+    const tempBoard = this.board.map(row => [...row]);
+    this.board[x][y] = color;
+    
+    const capturedGroups = this.findCapturedGroups(this.getOpponentColor(color));
+    
+    if (capturedGroups.length === 0 && this.hasNoLiberties(x, y)) {
+      errors.push('Suicide move not allowed');
+    }
+    
+    if (this.isKoViolation(x, y, capturedGroups)) {
+      errors.push('Ko rule violation');
+    }
+    
+    this.board = tempBoard;
+    
+    return {
+      valid: errors.length === 0,
+      errors: errors
+    };
   }
 }
 

@@ -199,13 +199,61 @@ const GoBoard = ({
       <Circle
         x={coords.x}
         y={coords.y}
-        radius={cellSize * 0.4}
-        fill={currentPlayer === 'black' ? '#000' : '#fff'}
-        stroke={currentPlayer === 'black' ? '#333' : '#000'}
-        strokeWidth={1}
-        opacity={0.5}
+        radius={cellSize * 0.35}
+        fill={currentPlayer === 'black' ? '#333' : '#f0f0f0'}
+        stroke={currentPlayer === 'black' ? '#666' : '#999'}
+        strokeWidth={2}
+        opacity={0.7}
+        dash={[5, 5]}
       />
     );
+  };
+
+  const renderTerritoryMarkers = () => {
+    if (!gameState?.territories) return null;
+    
+    const markers = [];
+    gameState.territories.forEach((territory, index) => {
+      if (territory.owner) {
+        territory.positions.forEach((pos, posIndex) => {
+          const coords = getCoordsFromPosition(pos.x, pos.y);
+          markers.push(
+            <Circle
+              key={`territory-${index}-${posIndex}`}
+              x={coords.x}
+              y={coords.y}
+              radius={cellSize * 0.1}
+              fill={territory.owner === 'black' ? '#000' : '#fff'}
+              opacity={0.6}
+            />
+          );
+        });
+      }
+    });
+    
+    return markers;
+  };
+
+  const renderDeadStones = () => {
+    if (!gameState?.deadStones) return null;
+    
+    const markers = [];
+    gameState.deadStones.forEach((pos, index) => {
+      const coords = getCoordsFromPosition(pos.x, pos.y);
+      markers.push(
+        <Line
+          key={`dead-${index}`}
+          points={[
+            coords.x - cellSize * 0.3, coords.y - cellSize * 0.3,
+            coords.x + cellSize * 0.3, coords.y + cellSize * 0.3
+          ]}
+          stroke="#ff0000"
+          strokeWidth={3}
+        />
+      );
+    });
+    
+    return markers;
   };
 
   const renderCoordinates = () => {
@@ -263,6 +311,8 @@ const GoBoard = ({
           {renderStarPoints()}
           {renderCoordinates()}
           {renderStones()}
+          {renderTerritoryMarkers()}
+          {renderDeadStones()}
           {renderHoverStone()}
         </Layer>
       </Stage>

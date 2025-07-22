@@ -206,6 +206,7 @@ class AIService {
   evaluatePosition(goEngine) {
     let score = 0;
     const boardSize = goEngine.boardSize;
+    const gamePhase = goEngine.getGamePhase();
 
     for (let x = 0; x < boardSize; x++) {
       for (let y = 0; y < boardSize; y++) {
@@ -213,14 +214,154 @@ class AIService {
         if (stone === 'black') {
           score += 1;
           score += this.evaluateStoneInfluence(goEngine, x, y);
+          score += this.evaluateStrategicValue(goEngine, x, y, gamePhase);
         } else if (stone === 'white') {
           score -= 1;
           score -= this.evaluateStoneInfluence(goEngine, x, y);
+          score -= this.evaluateStrategicValue(goEngine, x, y, gamePhase);
         }
       }
     }
 
+    score += this.evaluateTerritorialAdvantage(goEngine);
+    score += this.evaluateGroupSafety(goEngine);
+
     return score;
+  }
+
+  evaluateStrategicValue(goEngine, x, y, gamePhase) {
+    let value = 0;
+    
+    if (gamePhase === 'opening') {
+      if (this.isCornerMove({ x, y }, goEngine.boardSize)) value += 5;
+      if (this.isStarPoint(x, y, goEngine.boardSize)) value += 3;
+    } else if (gamePhase === 'middle') {
+      value += this.evaluateConnectionValue(goEngine, x, y);
+      value += this.evaluateCuttingValue(goEngine, x, y);
+    } else {
+      value += this.evaluateEndgameValue(goEngine, x, y);
+    }
+    
+    return value;
+  }
+
+  evaluateTerritorialAdvantage(goEngine) {
+    const territories = goEngine.findTerritories();
+    let advantage = 0;
+    
+    territories.forEach(territory => {
+      if (territory.owner === 'black') {
+        advantage += territory.size * 0.5;
+      } else if (territory.owner === 'white') {
+        advantage -= territory.size * 0.5;
+      }
+    });
+    
+    return advantage;
+  }
+
+  evaluateGroupSafety(goEngine) {
+    let safety = 0;
+    const visited = new Set();
+    
+    for (let x = 0; x < goEngine.boardSize; x++) {
+      for (let y = 0; y < goEngine.boardSize; y++) {
+        const stone = goEngine.getStone(x, y);
+        const key = `${x},${y}`;
+        
+        if (stone && !visited.has(key)) {
+          const group = goEngine.findGroup(x, y);
+          const liberties = goEngine.countLiberties(group);
+          
+          for (const pos of group) {
+            visited.add(`${pos.x},${pos.y}`);
+          }
+          
+          let groupSafety = 0;
+          if (liberties >= 3) groupSafety = 2;
+          else if (liberties === 2) groupSafety = 0;
+          else if (liberties === 1) groupSafety = -5;
+          else groupSafety = -10;
+          
+          if (stone === 'black') {
+            safety += groupSafety * group.length;
+          } else {
+            safety -= groupSafety * group.length;
+          }
+        }
+      }
+    }
+    
+    return safety;
+  }
+
+  isStarPoint(x, y, boardSize) {
+    const starPoints = this.getStarPoints(boardSize);
+    return starPoints.some(point => point.x === x && point.y === y);
+  }
+
+  getStarPoints(boardSize) {
+    if (boardSize === 19) {
+      return [
+        {x: 3, y: 3}, {x: 3, y: 9}, {x: 3, y: 15},
+        {x: 9, y: 3}, {x: 9, y: 9}, {x: 9, y: 15},
+        {x: 15, y: 3}, {x: 15, y: 9}, {x: 15, y: 15}
+      ];
+    } else if (boardSize === 13) {
+      return [
+        {x: 3, y: 3}, {x: 3, y: 9},
+        {x: 6, y: 6},
+        {x: 9, y: 3}, {x: 9, y: 9}
+      ];
+    } else if (boardSize === 9) {
+      return [
+        {x: 2, y: 2}, {x: 2, y: 6},
+        {x: 4, y: 4},
+        {x: 6, y: 2}, {x: 6, y: 6}
+      ];
+    }
+    return [];
+  }
+
+  evaluateConnectionValue(goEngine, x, y) {
+    let value = 0;
+    const neighbors = goEngine.getNeighbors(x, y);
+    
+    neighbors.forEach(neighbor => {
+      const stone = goEngine.getStone(neighbor.x, neighbor.y);
+      if (stone === 'black') {
+        value += 2;
+      }
+    });
+    
+    return value;
+  }
+
+  evaluateCuttingValue(goEngine, x, y) {
+    let value = 0;
+    const neighbors = goEngine.getNeighbors(x, y);
+    
+    const blackNeighbors = neighbors.filter(n => goEngine.getStone(n.x, n.y) === 'black').length;
+    const whiteNeighbors = neighbors.filter(n => goEngine.getStone(n.x, n.y) === 'white').length;
+    
+    if (blackNeighbors >= 2 && whiteNeighbors >= 1) {
+      value += 3;
+    }
+    
+    return value;
+  }
+
+  evaluateEndgameValue(goEngine, x, y) {
+    let value = 0;
+    
+    const neighbors = goEngine.getNeighbors(x, y);
+    const emptyNeighbors = neighbors.filter(n => goEngine.getStone(n.x, n.y) === null).length;
+    
+    if (emptyNeighbors <= 2) {
+      value += 2;
+    }
+    
+    return value;
   }
 
   evaluateStoneInfluence(goEngine, x, y) {
