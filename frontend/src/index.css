@@ -1,0 +1,297 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.game-board {
+  background-color: #deb887;
+  border: 2px solid #8b4513;
+}
+
+.game-stone {
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.game-stone:hover {
+  opacity: 0.8;
+}
+
+.game-stone.black {
+  fill: #000;
+  stroke: #333;
+  stroke-width: 1;
+}
+
+.game-stone.white {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: 1;
+}
+
+.game-controls {
+  margin: 20px 0;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.game-info {
+  background: #f5f5f5;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 10px 0;
+}
+
+.player-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  margin: 5px 0;
+}
+
+.player-info.current {
+  border-color: #1890ff;
+  background-color: #e6f7ff;
+}
+
+.captured-stones {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stone-count {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.stone-indicator {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid #666;
+}
+
+.stone-indicator.black {
+  background-color: #000;
+}
+
+.stone-indicator.white {
+  background-color: #fff;
+}
+
+.chat-container {
+  height: 300px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  background: #fafafa;
+}
+
+.chat-message {
+  margin-bottom: 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.chat-message .username {
+  font-weight: bold;
+  color: #1890ff;
+}
+
+.chat-message .timestamp {
+  font-size: 12px;
+  color: #999;
+  margin-left: 8px;
+}
+
+.chat-input {
+  border-top: 1px solid #d9d9d9;
+  padding: 10px;
+}
+
+.tutorial-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.tutorial-step {
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.tutorial-instruction {
+  font-size: 16px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background: #e6f7ff;
+  border-radius: 6px;
+}
+
+.tutorial-hint {
+  background: #fff7e6;
+  border: 1px solid #ffd591;
+  border-radius: 6px;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+.tutorial-feedback {
+  padding: 10px;
+  border-radius: 6px;
+  margin: 10px 0;
+}
+
+.tutorial-feedback.success {
+  background: #f6ffed;
+  border: 1px solid #b7eb8f;
+  color: #52c41a;
+}
+
+.tutorial-feedback.error {
+  background: #fff2f0;
+  border: 1px solid #ffccc7;
+  color: #ff4d4f;
+}
+
+.progress-bar {
+  margin: 20px 0;
+}
+
+.lobby-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.game-list {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.game-item {
+  padding: 15px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.game-item:hover {
+  background-color: #fafafa;
+}
+
+.game-item:last-child {
+  border-bottom: none;
+}
+
+.game-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.game-players {
+  display: flex;
+  gap: 10px;
+}
+
+.player-tag {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  background: #f0f0f0;
+}
+
+.online-users {
+  background: #fff;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.user-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.user-tag {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  background: #e6f7ff;
+  border: 1px solid #91d5ff;
+}
+
+.user-tag.playing {
+  background: #fff7e6;
+  border-color: #ffd591;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.error-message {
+  text-align: center;
+  color: #ff4d4f;
+  padding: 20px;
+  background: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 6px;
+  margin: 20px 0;
+}
+
+@media (max-width: 768px) {
+  .lobby-container {
+    padding: 10px;
+  }
+  
+  .tutorial-container {
+    padding: 10px;
+  }
+  
+  .game-controls {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .player-info {
+    flex-direction: column;
+    text-align: center;
+  }
+}
