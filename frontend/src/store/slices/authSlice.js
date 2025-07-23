@@ -41,8 +41,10 @@ export const checkAuth = createAsyncThunk(
       const response = await authAPI.getProfile();
       return { user: response.data.user, token };
     } catch (error) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
+      if (error.response?.status === 401 || error.message === 'No token found') {
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+      }
       return rejectWithValue('Authentication failed');
     }
   }
@@ -72,6 +74,7 @@ const authSlice = createSlice({
     isAuthenticated: false,
     loading: false,
     error: null,
+    justLoggedIn: false,
   },
   reducers: {
     clearError: (state) => {
@@ -79,6 +82,9 @@ const authSlice = createSlice({
     },
     updateUser: (state, action) => {
       state.user = { ...state.user, ...action.payload };
+    },
+    clearJustLoggedIn: (state) => {
+      state.justLoggedIn = false;
     },
   },
   extraReducers: (builder) => {
@@ -93,6 +99,7 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.token = action.payload.token;
         state.error = null;
+        state.justLoggedIn = true;
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
@@ -111,6 +118,7 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.token = action.payload.token;
         state.error = null;
+        state.justLoggedIn = true;
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
@@ -145,5 +153,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError, updateUser } = authSlice.actions;
+export const { clearError, updateUser, clearJustLoggedIn } = authSlice.actions;
 export default authSlice.reducer;

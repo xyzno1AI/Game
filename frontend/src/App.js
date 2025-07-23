@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Layout, message } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { checkAuth } from './store/slices/authSlice';
+import { checkAuth, clearJustLoggedIn } from './store/slices/authSlice';
 import { connectSocket, disconnectSocket } from './store/slices/socketSlice';
 import Header from './components/Layout/Header';
 import Login from './pages/Auth/Login';
@@ -20,12 +20,15 @@ const { Content } = Layout;
 
 function App() {
   const dispatch = useDispatch();
-  const { isAuthenticated, token } = useSelector(state => state.auth);
+  const { isAuthenticated, token, justLoggedIn } = useSelector(state => state.auth);
   const { error } = useSelector(state => state.socket);
 
   useEffect(() => {
-    dispatch(checkAuth());
-  }, [dispatch]);
+    const token = localStorage.getItem('token');
+    if (token && !window.location.pathname.includes('/login') && !justLoggedIn) {
+      dispatch(checkAuth());
+    }
+  }, [dispatch, justLoggedIn]);
 
   useEffect(() => {
     if (isAuthenticated && token) {
@@ -44,6 +47,15 @@ function App() {
       message.error(error);
     }
   }, [error]);
+
+  useEffect(() => {
+    if (justLoggedIn && isAuthenticated) {
+      const timer = setTimeout(() => {
+        dispatch(clearJustLoggedIn());
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [justLoggedIn, isAuthenticated, dispatch]);
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
