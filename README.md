@@ -234,7 +234,17 @@ git commit -m "fix: 修复围棋规则判断错误"
 git commit -m "docs: 更新API文档"
 ```
 
-## 部署指南
+## 📋 详细部署指南
+
+如需在不同操作系统上部署，请参考详细的部署文档：
+
+**[📖 查看完整部署指南 (DEPLOYMENT.md)](./DEPLOYMENT.md)**
+
+该文档包含：
+- 🪟 **Windows 环境**：官方安装包、Chocolatey、WSL配置
+- 🐧 **Linux 环境**：Ubuntu/Debian、CentOS/RHEL、生产环境配置
+- 🍎 **macOS 环境**：Homebrew、手动安装、系统配置
+- 🔧 **通用配置**：环境变量、数据库初始化、故障排除
 
 ### Docker部署
 ```bash
