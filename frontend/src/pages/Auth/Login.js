@@ -54,6 +54,10 @@ const Login = () => {
           onFinishFailed={(errorInfo) => {
             console.log('Form validation failed:', errorInfo);
           }}
+          onSubmit={(e) => {
+            console.log('=== Form onSubmit event triggered ===');
+            console.log('Event:', e);
+          }}
           layout="vertical"
           size="large"
           autoComplete="off"
@@ -93,6 +97,11 @@ const Login = () => {
               htmlType="submit"
               loading={loading}
               block
+              onClick={(e) => {
+                console.log('=== Login button clicked ===');
+                console.log('Button click event:', e);
+                console.log('Form values before submit:', form.getFieldsValue());
+              }}
             >
               登录
             </Button>
