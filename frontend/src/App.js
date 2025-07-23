@@ -25,8 +25,15 @@ function App() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token && !window.location.pathname.includes('/login') && !justLoggedIn) {
-      dispatch(checkAuth());
+    if (token) {
+      if (justLoggedIn) {
+        const timer = setTimeout(() => {
+          dispatch(checkAuth());
+        }, 500);
+        return () => clearTimeout(timer);
+      } else {
+        dispatch(checkAuth());
+      }
     }
   }, [dispatch, justLoggedIn]);
 
@@ -52,7 +59,7 @@ function App() {
     if (justLoggedIn && isAuthenticated) {
       const timer = setTimeout(() => {
         dispatch(clearJustLoggedIn());
-      }, 1000);
+      }, 2000);
       return () => clearTimeout(timer);
     }
   }, [justLoggedIn, isAuthenticated, dispatch]);
