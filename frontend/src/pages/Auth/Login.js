@@ -13,6 +13,9 @@ const Login = () => {
   const [form] = Form.useForm();
 
   const onFinish = (values) => {
+    console.log('=== Login form onFinish called ===');
+    console.log('Form values:', values);
+    console.log('Dispatching clearError and login actions...');
     dispatch(clearError());
     dispatch(login(values));
   };
@@ -50,6 +53,7 @@ const Login = () => {
           onFinish={onFinish}
           layout="vertical"
           size="large"
+          autoComplete="off"
         >
           <Form.Item
             name="username"
@@ -58,8 +62,10 @@ const Login = () => {
             ]}
           >
             <Input
+              name="username"
               prefix={<UserOutlined />}
               placeholder="用户名或邮箱"
+              autoComplete="username"
             />
           </Form.Item>
 
@@ -70,8 +76,10 @@ const Login = () => {
             ]}
           >
             <Input.Password
+              name="password"
               prefix={<LockOutlined />}
               placeholder="密码"
+              autoComplete="current-password"
             />
           </Form.Item>
 
