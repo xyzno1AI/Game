@@ -13,6 +13,7 @@ const Login = () => {
   const [form] = Form.useForm();
 
   const onFinish = (values) => {
+    alert('onFinish called with values: ' + JSON.stringify(values));
     console.log('Login form submitted with values:', values);
     dispatch(clearError());
     console.log('Dispatching login action...');
@@ -51,6 +52,7 @@ const Login = () => {
           name="login"
           onFinish={onFinish}
           onFinishFailed={(errorInfo) => {
+            alert('Form validation failed: ' + JSON.stringify(errorInfo));
             console.error('Form validation failed:', errorInfo);
           }}
           layout="vertical"
@@ -86,6 +88,7 @@ const Login = () => {
               htmlType="submit"
               loading={loading}
               block
+              onClick={() => alert('Button clicked!')}
             >
               登录
             </Button>
