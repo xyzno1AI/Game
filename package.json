@@ -1,0 +1,25 @@
+{
+  "name": "game-platform",
+  "version": "1.0.0",
+  "description": "Multi-user chess/board game platform with Go as the first game",
+  "main": "index.js",
+  "scripts": {
+    "install:all": "cd backend && npm install && cd ../frontend && npm install",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && npm start",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm start",
+    "test": "cd backend && npm test && cd ../frontend && npm test",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test",
+    "lint": "cd backend && npm run lint && cd ../frontend && npm run lint",
+    "lint:fix": "cd backend && npm run lint:fix && cd ../frontend && npm run lint:fix"
+  },
+  "keywords": ["game", "go", "weiqi", "multiplayer", "chess", "board-game"],
+  "author": "Game Platform Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xyzno1AI/Game.git"
+  }
+}
