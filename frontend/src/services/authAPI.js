@@ -2,6 +2,7 @@ import api from './api';
 
 const authAPI = {
   login: (username, password) => {
+    console.log('AuthAPI login called with:', { username, password: '***' });
     return api.post('/auth/login', { username, password });
   },
 

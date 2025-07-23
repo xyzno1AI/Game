@@ -13,7 +13,9 @@ const Login = () => {
   const [form] = Form.useForm();
 
   const onFinish = (values) => {
+    console.log('Login form submitted with values:', values);
     dispatch(clearError());
+    console.log('Dispatching login action...');
     dispatch(login(values));
   };
 
@@ -48,6 +50,9 @@ const Login = () => {
           form={form}
           name="login"
           onFinish={onFinish}
+          onFinishFailed={(errorInfo) => {
+            console.error('Form validation failed:', errorInfo);
+          }}
           layout="vertical"
           size="large"
         >

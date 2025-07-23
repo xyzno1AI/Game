@@ -5,11 +5,15 @@ export const login = createAsyncThunk(
   'auth/login',
   async ({ username, password }, { rejectWithValue }) => {
     try {
+      console.log('Login attempt:', { username, password: '***' });
       const response = await authAPI.login(username, password);
+      console.log('Login response:', response.data);
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('refreshToken', response.data.refreshToken);
       return response.data;
     } catch (error) {
+      console.error('Login error:', error);
+      console.error('Error response:', error.response?.data);
       return rejectWithValue(error.response?.data?.error?.message || 'Login failed');
     }
   }

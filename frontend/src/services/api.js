@@ -30,7 +30,8 @@ api.interceptors.response.use(
 
       try {
         const refreshToken = localStorage.getItem('refreshToken');
-        if (refreshToken) {
+        if (refreshToken && refreshToken !== 'null' && refreshToken !== 'undefined') {
+          console.log('Attempting token refresh with token:', refreshToken.substring(0, 20) + '...');
           const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {}, {
             headers: { Authorization: `Bearer ${refreshToken}` }
           });
@@ -41,8 +42,14 @@ api.interceptors.response.use(
 
           originalRequest.headers.Authorization = `Bearer ${token}`;
           return api(originalRequest);
+        } else {
+          console.log('No valid refresh token found, redirecting to login');
+          localStorage.removeItem('token');
+          localStorage.removeItem('refreshToken');
+          window.location.href = '/login';
         }
       } catch (refreshError) {
+        console.error('Token refresh failed:', refreshError);
         localStorage.removeItem('token');
         localStorage.removeItem('refreshToken');
         window.location.href = '/login';
