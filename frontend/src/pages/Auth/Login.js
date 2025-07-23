@@ -51,9 +51,13 @@ const Login = () => {
           form={form}
           name="login"
           onFinish={onFinish}
+          onFinishFailed={(errorInfo) => {
+            console.log('Form validation failed:', errorInfo);
+          }}
           layout="vertical"
           size="large"
           autoComplete="off"
+          validateTrigger="onSubmit"
         >
           <Form.Item
             name="username"
