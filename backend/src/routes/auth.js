@@ -171,7 +171,9 @@ router.post('/refresh', async (req, res, next) => {
       });
     }
 
+    logger.info(`Attempting to verify refresh token: ${refreshToken.substring(0, 20)}...`);
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    logger.info(`Refresh token verified for user: ${decoded.userId}`);
     const user = await User.findById(decoded.userId);
 
     if (!user) {

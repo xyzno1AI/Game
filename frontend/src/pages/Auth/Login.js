@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Form, Input, Button, Card, Alert, Typography } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
@@ -13,7 +13,10 @@ const Login = () => {
   const [form] = Form.useForm();
 
   const onFinish = (values) => {
+    alert('onFinish called with values: ' + JSON.stringify(values));
+    console.log('Login form submitted with values:', values);
     dispatch(clearError());
+    console.log('Dispatching login action...');
     dispatch(login(values));
   };
 
@@ -48,6 +51,10 @@ const Login = () => {
           form={form}
           name="login"
           onFinish={onFinish}
+          onFinishFailed={(errorInfo) => {
+            alert('Form validation failed: ' + JSON.stringify(errorInfo));
+            console.error('Form validation failed:', errorInfo);
+          }}
           layout="vertical"
           size="large"
         >
@@ -81,6 +88,7 @@ const Login = () => {
               htmlType="submit"
               loading={loading}
               block
+              onClick={() => alert('Button clicked!')}
             >
               登录
             </Button>
